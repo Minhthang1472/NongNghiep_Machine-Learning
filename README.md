@@ -1,24 +1,26 @@
-# 🍊 HỆ THỐNG PHÂN LOẠI TRÁI CÂY ỨNG DỤNG TRÍ TUỆ NHÂN TẠO (AI)
+# 🍊 HỆ THỐNG PHÂN LOẠI TRÁI CÂY TỰ ĐỘNG (AI & EXPERT SYSTEM)
 
-> **Mô hình học máy Deep Learning (MobileNetV2)** kết hợp giao diện đồ họa **PySide6** để nhận diện và kiểm định chất lượng tự động cho Nông nghiệp.
+> **Mô hình học máy Deep Learning (MobileNetV2)** kết hợp giao diện đồ họa **PySide6** và công nghệ xử lý ảnh **OpenCV**. Hỗ trợ nhận diện tự động qua Ảnh và Camera thời gian thực, tích hợp Hệ chuyên gia phân tích và tư vấn hành động trong dây chuyền Nông nghiệp.
 
 ---
 
-## 🌟 TỔNG QUAN HỆ THỐNG
-Hệ thống này được thiết kế để tự động hóa quy trình kiểm định chất lượng (QA) nông sản. Cốt lõi của hệ thống là mô hình học sâu (Deep Learning) sử dụng kiến trúc **MobileNetV2** do Google phát triển, đã được huấn luyện với hơn **13.500 bức ảnh** để nhận diện và phân tích chính xác trạng thái của trái cây.
+## 🌟 TỔNG QUAN HỆ THỐNG (PHIÊN BẢN V5.1)
+Hệ thống được thiết kế để tự động hóa hoàn toàn quy trình kiểm định chất lượng (QA) nông sản trong nhà máy.
 
-### 🎯 Tính năng nổi bật:
-- **Nhận diện Đa lớp (21 Classes):** Nhận diện 7 loại trái cây bao gồm: **Táo, Chuối, Nho, Cam, Ổi, Lựu, Dâu Tây**.
-- **Đánh giá Trạng thái (Ripeness):** Phân tích chính xác 3 trạng thái sinh học: **Chín, Xanh, Hư hỏng**.
-- **QA Tự động (Auto QA):** Đưa ra kết luận ngay lập tức và đề xuất cách xử lý cho từng trạng thái quả (Ví dụ: "Chuối còn xanh, cần ủ thêm 2-3 ngày").
-- **Giao diện Modern UI:** Giao diện Desktop Đen-Cam mang phong cách Sci-Fi/Industrial cực kỳ trực quan.
-- **Độ chính xác (Accuracy):** Đạt ngưỡng **~95%** trong môi trường giả định.
+### 🎯 Tính năng nổi bật V5.1:
+- **📷 Live Camera & OpenCV:** Hỗ trợ phân tích độ chín trực tiếp qua Camera (Webcam) liên tục theo thời gian thực (Real-time).
+- **🛡️ Bộ Lọc Nhận Diện Khuôn Mặt (Anti-Face):** Tích hợp công nghệ bảo mật OpenCV Haar Cascade. Camera sẽ tự động dừng quét và báo động nếu có người thò đầu/mặt vào băng chuyền quét AI.
+- **🧠 Hệ Chuyên Gia Tư Vấn (Expert System):** Không chỉ báo "Chín/Xanh", hệ thống tự động sinh ra Báo cáo chi tiết về đặc tính sinh học của quả và đưa ra **Đề xuất Hành động** cho công nhân (Ví dụ: "Cách ly quả hỏng tránh lây nấm mốc", "Ủ túi giấy 2 ngày để kích chín").
+- **📊 Lịch Sử Kiểm Định (Logs & Chart):** Tự động lưu lịch sử vào Database (CSV). Cung cấp màn hình hiển thị Bảng lịch sử và **Biểu đồ Thống kê (Donut Chart)** tự động vẽ.
+- **📥 Xuất Báo Cáo:** Hỗ trợ xuất dữ liệu ra file Excel/CSV phục vụ báo cáo.
+- **🇻🇳 Giao Diện 100% Tiếng Việt:** Ngôn ngữ kỹ thuật chuẩn công nghiệp, thiết kế Dark/Orange Mode sang trọng.
 
 ---
 
 ## ⚙️ CÔNG NGHỆ SỬ DỤNG
 - **Ngôn ngữ:** Python 3.11+
-- **Lõi Trí tuệ Nhân tạo:** TensorFlow & Keras
+- **Lõi Trí tuệ Nhân tạo:** TensorFlow & Keras (MobileNetV2)
+- **Thị giác Máy tính (Computer Vision):** OpenCV (`cv2`)
 - **Giao diện đồ họa (GUI):** PySide6 (Qt for Python)
 - **Xử lý Ma trận/Hình ảnh:** Numpy, Pillow (PIL)
 
@@ -27,39 +29,37 @@ Hệ thống này được thiết kế để tự động hóa quy trình kiể
 ## 🚀 HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG
 
 ### Bước 1: Chuẩn bị môi trường
-Yêu cầu máy tính phải cài đặt sẵn **Python 3.10** hoặc **3.11**. Mở Terminal (Command Prompt / PowerShell) và chạy lệnh sau để cài đặt các thư viện cần thiết:
+Yêu cầu cài đặt **Python 3.11**. Mở Terminal chạy lệnh cài đặt thư viện:
 ```bash
-pip install -r requirements.txt
+pip install tensorflow numpy pillow PySide6 opencv-python
 ```
-*(Nếu chưa có file requirements.txt, hãy tự chạy `pip install tensorflow numpy pillow PySide6`)*
 
 ### Bước 2: Chạy ứng dụng Giao diện (App Desktop)
-Sau khi cài đặt xong thư viện, bạn chạy lệnh sau để khởi động phần mềm:
+Khởi động phần mềm:
 ```bash
 python app.py
 ```
-1. Giao diện phần mềm `FRUIT_SCANNER_V1.0` sẽ hiện lên.
-2. Bấm vào nút **⇧ UPLOAD_IMAGE** màu cam ở góc trái.
-3. Chọn một bức ảnh trái cây (Táo, Cam, Chuối...) từ máy tính của bạn.
-4. Chờ 1 giây để hệ thống phân tích. Kết quả QA sẽ hiện ở bảng bên phải.
+1. Giao diện **FRUIT SCANNER AI** sẽ hiện lên.
+2. Bạn có thể chọn 1 trong 2 chế độ quét:
+   - **⇧ TẢI ẢNH LÊN:** Chọn 1 file ảnh có sẵn trên máy để kiểm định.
+   - **📷 BẬT CAMERA:** Đưa trái cây ra trước Webcam để máy tự động quét liên tục. *(Lưu ý: Không đưa mặt người vào)*
+3. Kết quả, Biểu đồ %, và Báo cáo Đề xuất sẽ hiển thị ở bảng bên phải.
+4. Bấm nút **📜 LỊCH SỬ KIỂM ĐỊNH (LOGS)** để xem biểu đồ tổng hợp và bấm **XUẤT EXCEL/CSV** để lấy báo cáo.
 
 ### Bước 3: Chạy ứng dụng bằng Dòng lệnh (Terminal)
-Nếu bạn không muốn dùng giao diện, bạn có thể kiểm tra ảnh nhanh bằng file `predict.py`:
+Nếu bạn chỉ muốn kiểm tra nhanh qua màn hình đen:
 ```bash
 python predict.py <đường_dẫn_tới_ảnh>
-# Ví dụ: python predict.py trai_oi.jpg
+# Ví dụ: python predict.py trai_cam.jpg
 ```
 
 ---
 
 ## 🧠 HƯỚNG DẪN HUẤN LUYỆN LẠI (TRAINING)
-Nếu bạn muốn bổ sung thêm trái cây mới vào bộ não AI, hãy thực hiện các bước sau:
-1. Chuẩn bị ảnh và bỏ vào trong thư mục `dataset/train/` theo định dạng tên nhãn (ví dụ: `dataset/train/Xoai_Chin`, `dataset/train/Xoai_Xanh`).
-2. Chạy lệnh:
-```bash
-python train.py
-```
-3. Sau khi chạy xong, hệ thống sẽ xuất ra 2 file mới là `fruit_model.h5` và `labels.txt`. Mặc định phần mềm sẽ tự động cập nhật và sử dụng mô hình mới này.
+Nếu muốn bổ sung trái cây mới:
+1. Chuẩn bị ảnh bỏ vào `dataset/train/<Tên_Nhãn>`
+2. Chạy lệnh: `python train.py`
+3. Hệ thống sẽ sinh ra `fruit_model.h5` và `labels.txt` mới để tự động cập nhật AI.
 
 ---
 **Bản quyền © 2026 - Dự án Machine Learning Nông Nghiệp.**

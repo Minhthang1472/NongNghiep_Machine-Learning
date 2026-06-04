@@ -1,0 +1,37 @@
+Timestamp,File Name,Fruit Type,Status,Confidence
+2026-06-04 11:00:35,trai_cam_non.jpg,Cam,Xanh,89.6%
+2026-06-04 11:14:36,tao_hu.jpg,Táo,Hư hỏng,70.0%
+2026-06-04 11:16:57,nho_moc.jpg,Nho,Hư hỏng,89.3%
+2026-06-04 11:17:02,chuoi.jpg,Chuối,Chín,99.9%
+2026-06-04 11:17:11,tao.jpg,Ổi,Chín,99.7%
+2026-06-04 11:17:20,chuoi_xanh.jpg,Chuối,Xanh,99.6%
+2026-06-04 11:33:47,nho_moc.jpg,Nho,Hư hỏng,89.3%
+2026-06-04 11:34:06,UnripeGuava (7).jpg,Ổi,Xanh,99.9%
+2026-06-04 11:34:17,UnripeGuava (58).jpg,Ổi,Xanh,95.9%
+2026-06-04 11:34:36,RottenGrape (81).jpg,Nho,Hư hỏng,91.4%
+2026-06-04 11:34:43,RottenGrape (90).jpg,Nho,Hư hỏng,93.2%
+2026-06-04 11:34:55,RipeGuava (4).jpg,Ổi,Chín,62.4%
+2026-06-04 11:35:18,RipeGuava (33).jpg,Ổi,Chín,98.2%
+2026-06-04 11:35:23,RipeGuava (47).jpg,Ổi,Chín,99.9%
+2026-06-04 11:35:27,RipeGuava (56).jpg,Ổi,Chín,91.0%
+2026-06-04 11:35:31,RipeGuava (605).jpg,Ổi,Chín,99.9%
+2026-06-04 11:35:37,RipeGuava (4).jpg,Ổi,Chín,62.4%
+2026-06-04 11:35:42,RipeGuava (6).jpg,Ổi,Chín,87.7%
+2026-06-04 11:39:50,tao.jpg,Ổi,Chín,99.7%
+2026-06-04 11:40:19,UnripeOrange (66).jpg,Cam,Xanh,99.3%
+2026-06-04 11:40:41,UnripeOrange (89).jpg,Cam,Xanh,99.8%
+2026-06-04 11:40:51,UnripeOrange (94).jpg,Cam,Xanh,99.8%
+2026-06-04 11:40:54,UnripeOrange (94).jpg,Cam,Xanh,99.8%
+2026-06-04 11:40:58,UnripeOrange (643).jpg,Cam,Xanh,99.9%
+2026-06-04 11:54:53,dia_trai_cay.jpg,Dâu Tây,Chín,99.7%
+2026-06-04 12:18:06,nho_moc.jpg,Nho,Hư hỏng,89.3%
+2026-06-04 12:18:12,trai_oi.jpg,Ổi,Chín,99.9%
+2026-06-04 12:18:18,trai_luu_non.jpg,Lựu,Xanh,99.9%
+2026-06-04 12:18:22,trai_luu.jpg,Lựu,Chín,98.1%
+2026-06-04 12:18:40,RipeStrawberry (75).jpg,Dâu Tây,Chín,99.5%
+2026-06-04 12:18:46,RipeStrawberry (77).jpg,Dâu Tây,Chín,99.9%
+2026-06-04 12:18:51,RipeStrawberry (97).jpg,Dâu Tây,Chín,99.9%
+2026-06-04 12:18:56,RipeStrawberry (74).jpg,Dâu Tây,Chín,99.6%
+2026-06-04 12:19:01,RipeStrawberry (94).jpg,Dâu Tây,Chín,99.9%
+2026-06-04 12:19:14,RipeStrawberry (96).jpg,Dâu Tây,Chín,99.9%
+2026-06-04 12:19:42,RottenGrape (9).jpg,Nho,Hư hỏng,75.0%

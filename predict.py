@@ -1,50 +1,44 @@
+import os
+import sys
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image # type: ignore
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
-import os
+from keras.preprocessing import image
 
-IMG_SIZE = (224, 224)
+# Tắt thông báo rác của TensorFlow
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.get_logger().setLevel('ERROR')
 
 def predict_image(img_path):
     model_path = 'fruit_model.h5'
     label_path = 'labels.txt'
 
     if not os.path.exists(model_path):
-        print("[LỖI] Không tìm thấy file 'fruit_model.h5'. Hãy chạy train.py trước!")
+        print("Lỗi: Không tìm thấy fruit_model.h5")
         return
     if not os.path.exists(img_path):
-        print(f"[LỖI] Không tìm thấy ảnh: {img_path}")
+        print(f"Lỗi: Không tìm thấy ảnh {img_path}")
         return
 
-    # Ẩn log rác
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-    # Đọc model và nhãn
+    # Load model & labels
     model = tf.keras.models.load_model(model_path)
     with open(label_path, 'r', encoding='utf-8') as f:
         labels = [line.strip() for line in f.readlines()]
 
-    # Xử lý ảnh đầu vào
-    img = image.load_img(img_path, target_size=IMG_SIZE)
+    # Load image
+    img = image.load_img(img_path, target_size=(224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0 # Chuẩn hóa giống lúc train
+    img_array /= 255.0
 
-    # Dự đoán
+    # Phân tích
     predictions = model.predict(img_array, verbose=0)
     best_idx = np.argmax(predictions[0])
-    predicted_class_idx = best_idx
-    confidence = predictions[0][best_idx] * 100
+    predicted_label = labels[best_idx]
 
-    # In kết quả đẹp mắt
-    # Chuyển đổi nhãn tiếng Anh sang tiếng Việt cho đẹp
-    predicted_label = labels[predicted_class_idx]
-    
-    loai_qua = "Không rõ"
-    do_chin = "Không rõ"
-    
+    # Phân tách Nhãn
+    loai_qua = "Chưa rõ"
+    do_chin = "Chưa rõ"
+
     if "Apple" in predicted_label: loai_qua = "Táo"
     elif "Banana" in predicted_label: loai_qua = "Chuối"
     elif "Grape" in predicted_label: loai_qua = "Nho"
@@ -57,58 +51,7 @@ def predict_image(img_path):
     elif "Unripe" in predicted_label: do_chin = "Xanh"
     elif "Rotten" in predicted_label: do_chin = "Hư hỏng"
 
-    # Cơ chế ra quyết định tự động CHUYÊN SÂU THEO TỪNG LOẠI QUẢ
-    if do_chin == "Hư hỏng":
-        ket_luan = f"KHÔNG ĐƯỢC SỬ DỤNG ❌ ({loai_qua} đã hỏng, cần loại bỏ ngay để tránh lây nấm mốc)"
-    elif do_chin == "Xanh":
-        if loai_qua == "Chuối":
-            ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ⚠️ (Chuối còn xanh, cần ủ thêm 2-3 ngày)"
-        elif loai_qua == "Cam":
-            ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ⚠️ (Cam còn xanh, vắt nước sẽ rất chua)"
-        elif loai_qua == "Ổi":
-            ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ⚠️ (Ổi xanh, thịt cứng và chát)"
-        elif loai_qua == "Táo":
-            ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ⚠️ (Táo xanh, độ đường chưa đạt chuẩn)"
-        elif loai_qua == "Dâu Tây":
-            ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ⚠️ (Dâu tây chưa chín, vị chua gắt)"
-        else:
-            ket_luan = f"KHÔNG ĐƯỢC SỬ DỤNG ⚠️ ({loai_qua} còn xanh, chưa đạt tiêu chuẩn thu hoạch)"
-    elif do_chin == "Chín":
-        if confidence >= 75.0:
-            if loai_qua == "Chuối":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Chuối chín vàng, thích hợp ăn tươi hoặc làm bánh)"
-            elif loai_qua == "Cam":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Cam chín mọng nước, lượng vitamin C cao nhất)"
-            elif loai_qua == "Nho":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Nho chín, độ ngọt brix cao, thích hợp ép rượu/ăn tươi)"
-            elif loai_qua == "Lựu":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Lựu chín đỏ, hạt mọng nước)"
-            elif loai_qua == "Dâu Tây":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Dâu tây chín mọng, nên sử dụng ngay để tránh dập nát)"
-            elif loai_qua == "Táo":
-                ket_luan = "ĐƯỢC SỬ DỤNG ✅ (Táo thơm, giòn ngọt, đạt chuẩn xuất khẩu)"
-            else:
-                ket_luan = f"ĐƯỢC SỬ DỤNG ✅ ({loai_qua} chín đẹp, đạt chuẩn an toàn)"
-        else:
-            ket_luan = "CẦN KIỂM TRA THỦ CÔNG ⚠️ (Độ tin cậy chưa đủ an toàn)"
-    else:
-        ket_luan = "KHÔNG ĐƯỢC SỬ DỤNG ❌ (Không xác định)"
-
-    print("\n" + "="*50)
-    print(" KẾT QUẢ PHÂN LOẠI TRÁI CÂY")
-    print("="*50)
-    print(f"Ảnh đầu vào: {os.path.basename(img_path)}")
-    print(f"-> Loại trái cây: {loai_qua.upper()}")
-    print(f"-> Trạng thái   : {do_chin.upper()}")
-    print(f"-> Độ tin cậy   : {confidence:.2f}%")
-    print(f"-> KẾT LUẬN     : {ket_luan}")
-    print("-" * 50)
-    print("Xác suất chi tiết (Mức độ chín):")
-    
-    prob_chin = 0.0
-    prob_xanh = 0.0
-    prob_hu_hong = 0.0
-    
+    prob_chin, prob_xanh, prob_hu_hong = 0.0, 0.0, 0.0
     for i, label in enumerate(labels):
         if "Ripe" in label and "Unripe" not in label:
             prob_chin += predictions[0][i] * 100
@@ -116,11 +59,48 @@ def predict_image(img_path):
             prob_xanh += predictions[0][i] * 100
         elif "Rotten" in label:
             prob_hu_hong += predictions[0][i] * 100
-            
-    print(f"  Chín        : {prob_chin:>6.2f}%")
-    print(f"  Xanh        : {prob_xanh:>6.2f}%")
-    print(f"  Hư hỏng     : {prob_hu_hong:>6.2f}%")
-    print("="*40 + "\n")
+
+    if do_chin == "Chín":
+        confidence = prob_chin
+    elif do_chin == "Xanh":
+        confidence = prob_xanh
+    else:
+        confidence = prob_hu_hong
+        
+    if confidence > 99.9: confidence = 99.9
+
+    # Tiếng Việt hoàn toàn
+    if do_chin == "Hư hỏng":
+        ket_luan = f"TỪ CHỐI ❌ ({loai_qua} đã hỏng, yêu cầu cách ly để tránh nấm mốc)"
+        status_dot = "● HƯ HỎNG (ROTTEN)"
+    elif do_chin == "Xanh":
+        ket_luan = f"CẢNH BÁO ⚠️ (Nồng độ đường (Brix) chưa đạt ngưỡng)"
+        status_dot = "● QUẢ XANH (UNRIPE)"
+    elif do_chin == "Chín":
+        if confidence >= 75.0:
+            ket_luan = f"ĐẠT CHUẨN ✅ (Độ đường và vitamin đạt mức tối ưu)"
+            status_dot = "● CHÍN ĐẠT CHUẨN"
+        else:
+            ket_luan = "KIỂM TRA THỦ CÔNG ⚠️ (Độ tin cậy của AI thấp)"
+            status_dot = "● CHÍN (THIẾU TIN CẬY)"
+    else:
+        ket_luan = "LỖI HỆ THỐNG ❌"
+        status_dot = "● LỖI (ERROR)"
+
+    print("\n" + "="*55)
+    print(" 🍊 KẾT QUẢ KIỂM ĐỊNH TRÁI CÂY (AI SCANNER V4.0)")
+    print("="*55)
+    print(f" [IMG] File ảnh    : {os.path.basename(img_path)}")
+    print(f" [QA]  Loại quả    : {loai_qua.upper()}")
+    print(f" [QA]  Trạng thái  : {status_dot}")
+    print(f" [QA]  Độ tin cậy  : {confidence:.2f}%")
+    print(f" [QA]  KẾT LUẬN    : {ket_luan}")
+    print("-" * 55)
+    print(" 📊 XÁC SUẤT CHI TIẾT THEO TRẠNG THÁI:")
+    print(f"    - Chín         : {prob_chin:>6.2f}%")
+    print(f"    - Xanh         : {prob_xanh:>6.2f}%")
+    print(f"    - Hư hỏng      : {prob_hu_hong:>6.2f}%")
+    print("="*55 + "\n")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
