@@ -29,10 +29,12 @@ Hệ thống được thiết kế để tự động hóa hoàn toàn quy trìn
 ## 🚀 HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG
 
 ### Bước 1: Chuẩn bị môi trường
-Yêu cầu cài đặt **Python 3.11**. Mở Terminal chạy lệnh cài đặt thư viện:
+Yêu cầu cài đặt **Python 3.11**. Cài toàn bộ thư viện của dự án bằng:
 ```bash
-pip install tensorflow numpy pillow PySide6 opencv-python
+pip install -r requirements.txt
 ```
+
+Nếu bạn muốn huấn luyện lại model, hãy cài thêm đúng bộ dependency trong `requirements.txt` trước khi chạy `train.py`.
 
 ### Bước 2: Chạy ứng dụng Giao diện (App Desktop)
 Khởi động phần mềm:
@@ -57,9 +59,14 @@ python predict.py <đường_dẫn_tới_ảnh>
 
 ## 🧠 HƯỚNG DẪN HUẤN LUYỆN LẠI (TRAINING)
 Nếu muốn bổ sung trái cây mới:
-1. Chuẩn bị ảnh bỏ vào `dataset/train/<Tên_Nhãn>`
+1. Chuẩn bị dữ liệu huấn luyện theo cấu trúc `dataset/train/<Tên_Nhãn>`
 2. Chạy lệnh: `python train.py`
 3. Hệ thống sẽ sinh ra `fruit_model.h5` và `labels.txt` mới để tự động cập nhật AI.
+
+### Ghi chú
+- Ứng dụng desktop chạy bằng `python app.py`
+- Suy luận nhanh bằng dòng lệnh: `python predict.py <đường_dẫn_tới_ảnh>`
+- Nếu train lại, file `fruit_model.h5` và `labels.txt` sẽ bị ghi đè theo dataset hiện có trong `dataset/train`
 
 ---
 **Bản quyền © 2026 - Dự án Machine Learning Nông Nghiệp.**
