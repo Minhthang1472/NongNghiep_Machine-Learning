@@ -35,3 +35,38 @@ Timestamp,File Name,Fruit Type,Status,Confidence
 2026-06-04 12:19:01,RipeStrawberry (94).jpg,Dâu Tây,Chín,99.9%
 2026-06-04 12:19:14,RipeStrawberry (96).jpg,Dâu Tây,Chín,99.9%
 2026-06-04 12:19:42,RottenGrape (9).jpg,Nho,Hư hỏng,75.0%
+2026-06-04 13:44:28,Trái_táo.jpg,Táo,Chín,99.9%
+2026-06-04 13:44:34,Quả_Chuối.jpg,Ổi,Hư hỏng,67.9%
+2026-06-04 13:53:43,Quả_Chuối.jpg,Chuối,Hư hỏng,99.9%
+2026-06-04 13:53:51,Trái_táo.jpg,Táo,Chín,72.0%
+2026-06-04 13:54:28,nho_moc.jpg,Nho,Hư hỏng,89.4%
+2026-06-04 13:56:12,trai_luu_non.jpg,Lựu,Xanh,96.5%
+2026-06-04 13:56:30,trai_luu.jpg,Lựu,Chín,60.7%
+2026-06-04 13:56:57,Trái_táo.jpg,Táo,Chín,72.0%
+2026-06-04 13:57:29,RipeOrange (80).jpg,Cam,Chín,99.8%
+2026-06-04 13:57:35,RipeOrange (96).jpg,Cam,Hư hỏng,92.2%
+2026-06-04 13:57:50,RipeOrange (93).jpg,Cam,Chín,80.5%
+2026-06-04 14:00:17,Quả_Chuối.jpg,Táo,Hư hỏng,71.3%
+2026-06-04 14:00:23,Trái_táo.jpg,Táo,Chín,98.9%
+2026-06-04 14:01:32,Quả_Chuối.jpg,Ổi,Hư hỏng,81.3%
+2026-06-04 14:04:57,RottenGrape (77).jpg,Nho,Hư hỏng,82.1%
+2026-06-04 14:05:14,RipeGrape (58).jpg,Nho,Chín,99.3%
+2026-06-04 14:05:19,RipeGrape (69).jpg,Nho,Xanh,62.4%
+2026-06-04 14:05:31,RipeGrape (66).jpg,Nho,Xanh,94.3%
+2026-06-04 14:05:35,RipeGrape (70).jpg,Nho,Xanh,93.4%
+2026-06-04 14:05:42,RipeGrape (66).jpg,Nho,Xanh,94.3%
+2026-06-04 14:05:46,RipeGrape (7).jpg,Nho,Chín,89.6%
+2026-06-04 14:05:50,RipeGrape (54).jpg,Nho,Chín,99.9%
+2026-06-04 14:05:55,RipeGrape (58).jpg,Nho,Chín,99.3%
+2026-06-04 14:06:31,RipeApple (48).jpg,Táo,Chín,99.9%
+2026-06-04 14:06:35,RipeApple (8).jpg,Táo,Chín,99.7%
+2026-06-04 14:06:42,RottenApple (7).jpg,Táo,Hư hỏng,99.9%
+2026-06-04 14:06:46,RottenApple (48).jpg,Táo,Hư hỏng,99.7%
+2026-06-04 14:06:50,RottenApple (55).jpg,Táo,Hư hỏng,99.9%
+2026-06-04 14:07:06,UnripeGrape (60).jpg,Nho,Xanh,99.9%
+2026-06-04 14:07:17,UnripeGuava (40).jpg,Ổi,Xanh,99.8%
+2026-06-04 14:07:28,RipeBanana (9).jpg,Chuối,Chín,99.9%
+2026-06-04 14:07:37,RipeBanana (76).jpg,Chuối,Chín,99.9%
+2026-06-04 14:07:52,RottenBanana (9).jpg,Chuối,Hư hỏng,99.9%
+2026-06-04 14:07:56,RottenBanana (45).jpg,Chuối,Hư hỏng,99.9%
+2026-06-04 14:08:00,RottenBanana (52).jpg,Chuối,Hư hỏng,99.9%

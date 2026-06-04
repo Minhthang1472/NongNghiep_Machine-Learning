@@ -4,12 +4,12 @@
 
 ---
 
-## 🌟 TỔNG QUAN HỆ THỐNG (PHIÊN BẢN V5.1)
+## 🌟 TỔNG QUAN HỆ THỐNG
 Hệ thống được thiết kế để tự động hóa hoàn toàn quy trình kiểm định chất lượng (QA) nông sản trong nhà máy.
 
-### 🎯 Tính năng nổi bật V5.1:
+### 🎯 Tính năng nổi bật 
 - **📷 Live Camera & OpenCV:** Hỗ trợ phân tích độ chín trực tiếp qua Camera (Webcam) liên tục theo thời gian thực (Real-time).
-- **🛡️ Bộ Lọc Nhận Diện Khuôn Mặt (Anti-Face):** Tích hợp công nghệ bảo mật OpenCV Haar Cascade. Camera sẽ tự động dừng quét và báo động nếu có người thò đầu/mặt vào băng chuyền quét AI.
+- **🎯 Khung Ngắm AI Thông Minh (Target Box):** Hệ thống tự động tạo khung ngắm (Bounding box) tập trung phân tích vùng chứa trái cây, tự động loại bỏ rác/ngoại cảnh xung quanh giúp AI phân tích cực kỳ chính xác.
 - **🧠 Hệ Chuyên Gia Tư Vấn (Expert System):** Không chỉ báo "Chín/Xanh", hệ thống tự động sinh ra Báo cáo chi tiết về đặc tính sinh học của quả và đưa ra **Đề xuất Hành động** cho công nhân (Ví dụ: "Cách ly quả hỏng tránh lây nấm mốc", "Ủ túi giấy 2 ngày để kích chín").
 - **📊 Lịch Sử Kiểm Định (Logs & Chart):** Tự động lưu lịch sử vào Database (CSV). Cung cấp màn hình hiển thị Bảng lịch sử và **Biểu đồ Thống kê (Donut Chart)** tự động vẽ.
 - **📥 Xuất Báo Cáo:** Hỗ trợ xuất dữ liệu ra file Excel/CSV phục vụ báo cáo.

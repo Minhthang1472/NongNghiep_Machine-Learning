@@ -7,6 +7,8 @@ import numpy as np
 import tensorflow as tf
 from keras.preprocessing import image
 import cv2
+from PIL import Image
+import io
 
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                                QHBoxLayout, QPushButton, QLabel, QFileDialog, 
@@ -213,8 +215,8 @@ def create_shadow():
 class FruitScannerApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PHẦN MỀM KIỂM ĐỊNH TRÁI CÂY V4.0")
-        self.setGeometry(50, 50, 1050, 780) # Tăng thêm chiều cao để hiển thị text rộng rãi hơn
+        self.setWindowTitle("PHẦN MỀM KIỂM ĐỊNH TRÁI CÂY")
+        self.setGeometry(50, 50, 1050, 780) 
         self.setStyleSheet(QSS)
         
         self.model = None
@@ -224,9 +226,6 @@ class FruitScannerApp(QMainWindow):
         self.timer.timeout.connect(self.update_camera_frame)
         self.frame_counter = 0
         self.camera_active = False
-        
-        # BỘ LỌC CHỐNG NHẬN DIỆN KHUÔN MẶT CƠ BẢN
-        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
         self.load_model_data()
         self.init_ui()
@@ -380,7 +379,6 @@ class FruitScannerApp(QMainWindow):
         qa_title.setObjectName("SectionTitle")
         a_layout.addWidget(qa_title)
         
-        # Bật Rich Text HTML cho Label để hiển thị đẹp hơn
         self.lbl_qa_val = QLabel("HỆ THỐNG ĐANG CHỜ...\nVui lòng tải ảnh hoặc mở camera.")
         self.lbl_qa_val.setTextFormat(Qt.RichText)
         self.lbl_qa_val.setWordWrap(True)
@@ -428,15 +426,29 @@ class FruitScannerApp(QMainWindow):
             frame = cv2.flip(frame, 1)
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+            h_frame, w_frame, _ = frame_rgb.shape
             
-            is_human_detected = len(faces) > 0
+            # Khung Ngắm (Target Box) ở giữa màn hình
+            box_size = 280
+            x_start = max(0, (w_frame - box_size) // 2)
+            y_start = max(0, (h_frame - box_size) // 2)
+            x_end = min(w_frame, x_start + box_size)
+            y_end = min(h_frame, y_start + box_size)
             
-            if is_human_detected:
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(frame_rgb, (x, y), (x+w, y+h), (255, 0, 0), 3)
-                    cv2.putText(frame_rgb, "CON NGUOI", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+            target_crop = frame_rgb[y_start:y_end, x_start:x_end]
+            
+            # Vẽ Khung ngắm
+            cv2.rectangle(frame_rgb, (x_start, y_start), (x_end, y_end), (255, 204, 0), 3)
+            text = "DAT TRAI CAY VAO O NAY"
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.6
+            thickness = 2
+            text_size = cv2.getTextSize(text, font, font_scale, thickness)[0]
+            text_x = x_start + (box_size - text_size[0]) // 2
+            text_y = y_start - 15
+            cv2.rectangle(frame_rgb, (text_x - 5, text_y - text_size[1] - 5), 
+                          (text_x + text_size[0] + 5, text_y + 5), (0, 0, 0), -1)
+            cv2.putText(frame_rgb, text, (text_x, text_y), font, font_scale, (255, 204, 0), thickness)
             
             h, w, ch = frame_rgb.shape
             bytes_per_line = ch * w
@@ -453,36 +465,40 @@ class FruitScannerApp(QMainWindow):
 
             self.img_display.setPixmap(square_pixmap)
 
-            if is_human_detected:
-                self.frame_counter = 0 
-                self.lbl_type_val.setText("KHÔNG HỢP LỆ")
-                self.lbl_status_val.setText("● PHÁT HIỆN CON NGƯỜI")
-                self.lbl_status_val.setStyleSheet("color: #FF3B30; font-size: 16px; font-weight: bold;")
-                self.lbl_pct_chin.setText("Chín: 0.0%")
-                self.lbl_pct_xanh.setText("Xanh: 0.0%")
-                self.lbl_pct_hong.setText("Hỏng: 0.0%")
-                self.lbl_conf_val.setText("0.0%")
-                self.progress_bar.setValue(0)
-                
-                # HTML Warning
-                warning_html = """
-                <b style='color:#FF3B30; font-size:16px;'>CẢNH BÁO BẢO MẬT HỆ THỐNG ❌</b><br><br>
-                <b>🩺 Đánh giá:</b> Hệ thống phát hiện khuôn mặt người trong khu vực quét băng chuyền tự động.<br><br>
-                <b>🛠️ Hành động:</b> AI chỉ dùng để phân tích trái cây. Vui lòng không đưa người vào camera để đảm bảo độ chính xác!
-                """
-                self.lbl_qa_val.setText(warning_html)
-            else:
-                self.frame_counter += 1
-                if self.frame_counter >= 15:
-                    self.frame_counter = 0
-                    frame_rgb_clean = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    img_resized = cv2.resize(frame_rgb_clean, IMG_SIZE)
+            self.frame_counter += 1
+            if self.frame_counter >= 15:
+                self.frame_counter = 0
+                if target_crop.shape[0] > 0 and target_crop.shape[1] > 0:
+                    img_resized = cv2.resize(target_crop, IMG_SIZE)
                     img_array = np.expand_dims(img_resized, axis=0) / 255.0
                     self.run_prediction(img_array, source="Live_Camera", save_to_log=False)
 
     def show_logs(self):
         dialog = LogDialog(self)
         dialog.exec()
+
+    def process_uploaded_image(self, file_path):
+        """Hàm xử lý ảnh tải lên (Letterboxing để giữ đúng tỷ lệ)"""
+        # Đọc ảnh gốc bằng PIL
+        input_image = Image.open(file_path).convert("RGB")
+        
+        # Letterboxing (Căn giữa và giữ nguyên tỷ lệ, thêm viền đen)
+        w, h = input_image.size
+        max_dim = max(w, h)
+        padded_img = Image.new("RGB", (max_dim, max_dim), (0, 0, 0))
+        pad_w = (max_dim - w) // 2
+        pad_h = (max_dim - h) // 2
+        padded_img.paste(input_image, (pad_w, pad_h))
+        
+        # Resize về đúng 224x224
+        # Dùng LANCZOS để ảnh mượt mà nhất
+        resized_img = padded_img.resize(IMG_SIZE, Image.Resampling.LANCZOS)
+        
+        # Chuyển sang dạng Array cho mô hình AI
+        img_array = np.array(resized_img)
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
+        
+        return img_array, padded_img
 
     def select_image(self):
         if self.camera_active:
@@ -491,24 +507,38 @@ class FruitScannerApp(QMainWindow):
         if self.model is None: return
         file_path, _ = QFileDialog.getOpenFileName(self, "Chọn ảnh trái cây", "", "Images (*.png *.jpg *.jpeg)")
         if file_path:
-            pixmap = QPixmap(file_path)
-            pixmap = pixmap.scaled(380, 380, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+            # Hiện thông báo chờ
+            self.lbl_qa_val.setText("ĐANG PHÂN TÍCH HÌNH ẢNH...\nVui lòng chờ trong giây lát.")
+            self.lbl_qa_val.setStyleSheet("color: #2196F3; font-size: 15px; font-weight: bold; background-color: #1A1A1A;")
+            QApplication.processEvents()
             
-            square_pixmap = QPixmap(380, 380)
-            square_pixmap.fill(Qt.transparent)
-            painter = QPainter(square_pixmap)
-            x_offset = (pixmap.width() - 380) // 2
-            y_offset = (pixmap.height() - 380) // 2
-            painter.drawPixmap(0, 0, pixmap, x_offset, y_offset, 380, 380)
-            painter.end()
+            try:
+                # Xử lý Letterboxing
+                img_array, padded_img = self.process_uploaded_image(file_path)
+                
+                # Hiển thị ảnh lên giao diện
+                byte_arr = io.BytesIO()
+                padded_img.save(byte_arr, format='PNG')
+                qimg = QImage()
+                qimg.loadFromData(byte_arr.getvalue())
+                
+                pixmap = QPixmap.fromImage(qimg)
+                pixmap = pixmap.scaled(380, 380, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+                
+                square_pixmap = QPixmap(380, 380)
+                square_pixmap.fill(Qt.transparent)
+                painter = QPainter(square_pixmap)
+                x_offset = (square_pixmap.width() - pixmap.width()) // 2
+                y_offset = (square_pixmap.height() - pixmap.height()) // 2
+                painter.drawPixmap(x_offset, y_offset, pixmap)
+                painter.end()
 
-            self.img_display.setPixmap(square_pixmap)
-            
-            img = image.load_img(file_path, target_size=IMG_SIZE)
-            img_array = image.img_to_array(img)
-            img_array = np.expand_dims(img_array, axis=0) / 255.0
-            
-            self.run_prediction(img_array, source=os.path.basename(file_path), save_to_log=True)
+                self.img_display.setPixmap(square_pixmap)
+                
+                # Chạy phân tích AI
+                self.run_prediction(img_array, source=os.path.basename(file_path), save_to_log=True)
+            except Exception as e:
+                QMessageBox.critical(self, "Lỗi Tải Ảnh", f"Lỗi trong quá trình xử lý ảnh:\n{e}")
 
     def save_log(self, filename, fruit, status, conf):
         file_exists = os.path.exists("scan_logs.csv")
@@ -520,7 +550,6 @@ class FruitScannerApp(QMainWindow):
             writer.writerow([timestamp, filename, fruit, status, conf])
             
     def get_advice_html(self, loai_qua, do_chin):
-        """Hệ chuyên gia đưa ra lời khuyên với định dạng HTML chuẩn chuyên nghiệp"""
         if do_chin == "Hư hỏng":
             return f"""
             <b style='color:#FF3B30; font-size:16px;'>TỪ CHỐI (REJECTED) ❌</b><br><br>
@@ -530,52 +559,29 @@ class FruitScannerApp(QMainWindow):
             
         advice = ""
         if loai_qua == "Chuối":
-            if do_chin == "Chín":
-                advice = "Chuối đã chín vàng, lượng đường fructose và kali đạt mức hoàn hảo cho tiêu dùng. Sinh tố tự nhiên phát triển đầy đủ mùi thơm.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn xuất xưởng và bán lẻ. Khuyên người dùng bảo quản ở nhiệt độ phòng, không cho vào tủ lạnh để tránh thâm vỏ."
-            elif do_chin == "Xanh": 
-                advice = "Chuối còn xanh, chứa lượng lớn tinh bột kháng và tanin gây ra vị chát. Quả chưa phát triển đủ mùi thơm.<br><br><b>🛠️ Đề xuất xử lý:</b> Phân loại vào khu vực ủ. Nên ủ kín ở nhiệt độ 20°C cùng khí Ethylene sinh học (hoặc táo/cà chua) trong 2-3 ngày để kích chín đồng loạt."
-        
+            if do_chin == "Chín": advice = "Chuối đã chín vàng, lượng đường fructose và kali đạt mức hoàn hảo cho tiêu dùng. Sinh tố tự nhiên phát triển đầy đủ mùi thơm.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn xuất xưởng và bán lẻ. Khuyên người dùng bảo quản ở nhiệt độ phòng, không cho vào tủ lạnh để tránh thâm vỏ."
+            elif do_chin == "Xanh": advice = "Chuối còn xanh, chứa lượng lớn tinh bột kháng và tanin gây ra vị chát. Quả chưa phát triển đủ mùi thơm.<br><br><b>🛠️ Đề xuất xử lý:</b> Phân loại vào khu vực ủ. Nên ủ kín ở nhiệt độ 20°C cùng khí Ethylene sinh học (hoặc táo/cà chua) trong 2-3 ngày để kích chín đồng loạt."
         elif loai_qua == "Cam":
-            if do_chin == "Chín": 
-                advice = "Cam mọng nước, vỏ mỏng dần, lượng vitamin C và độ ngọt (Brix) đạt ngưỡng cao nhất.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho các dây chuyền vắt nước ép hoặc bán lẻ trái cây tươi. Bảo quản ở kho lạnh 5-10°C để kéo dài độ tươi."
-            elif do_chin == "Xanh": 
-                advice = "Cam còn xanh, vỏ cứng chứa nhiều tinh dầu đắng, lượng nước ít và hàm lượng axit cao (vị chua gắt).<br><br><b>🛠️ Đề xuất xử lý:</b> Để ở nhiệt độ phòng có độ ẩm thích hợp thêm vài ngày cho quả xuống nước và tăng độ ngọt tự nhiên."
-        
+            if do_chin == "Chín": advice = "Cam mọng nước, vỏ mỏng dần, lượng vitamin C và độ ngọt (Brix) đạt ngưỡng cao nhất.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho các dây chuyền vắt nước ép hoặc bán lẻ trái cây tươi. Bảo quản ở kho lạnh 5-10°C để kéo dài độ tươi."
+            elif do_chin == "Xanh": advice = "Cam còn xanh, vỏ cứng chứa nhiều tinh dầu đắng, lượng nước ít và hàm lượng axit cao (vị chua gắt).<br><br><b>🛠️ Đề xuất xử lý:</b> Để ở nhiệt độ phòng có độ ẩm thích hợp thêm vài ngày cho quả xuống nước và tăng độ ngọt tự nhiên."
         elif loai_qua == "Táo":
-            if do_chin == "Chín": 
-                advice = "Táo chín tới, cấu trúc thịt quả giòn và độ ngọt đạt đỉnh (đỉnh sinh trưởng).<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt tiêu chuẩn xuất khẩu Loại 1. Chuyển ngay vào hệ thống kho lạnh (0-4°C) để ức chế quá trình sinh hơi Ethylene, giúp duy trì độ giòn."
-            elif do_chin == "Xanh": 
-                advice = "Táo chưa đạt tiêu chuẩn độ đường (Brix), thịt quả cứng và có vị chát nhẹ.<br><br><b>🛠️ Đề xuất xử lý:</b> Đặt ở môi trường thoáng mát vài ngày. Táo tự sinh khí ethylene nên sẽ tự làm chín rất nhanh chóng."
-        
+            if do_chin == "Chín": advice = "Táo chín tới, cấu trúc thịt quả giòn và độ ngọt đạt đỉnh (đỉnh sinh trưởng).<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt tiêu chuẩn xuất khẩu Loại 1. Chuyển ngay vào hệ thống kho lạnh (0-4°C) để ức chế quá trình sinh hơi Ethylene, giúp duy trì độ giòn."
+            elif do_chin == "Xanh": advice = "Táo chưa đạt tiêu chuẩn độ đường (Brix), thịt quả cứng và có vị chát nhẹ.<br><br><b>🛠️ Đề xuất xử lý:</b> Đặt ở môi trường thoáng mát vài ngày. Táo tự sinh khí ethylene nên sẽ tự làm chín rất nhanh chóng."
         elif loai_qua == "Dâu Tây":
-            if do_chin == "Chín": 
-                advice = "Dâu chín đỏ mọng toàn phần, hương thơm nồng nàn đặc trưng, rất dễ bị dập.<br><br><b>🛠️ Đề xuất xử lý:</b> Phải phân phối ngay trong ngày. Nếu lưu kho, bắt buộc bảo quản ngăn mát tủ lạnh và dùng trong tối đa 3 ngày. Tránh rửa nước khi chưa sử dụng."
-            elif do_chin == "Xanh": 
-                advice = "Phần lớn vỏ quả còn trắng hoặc xanh non. Dâu tây đặc biệt <b>KHÔNG</b> tự chín thêm sau khi đã bị hái khỏi cây.<br><br><b>🛠️ Đề xuất xử lý:</b> Không đạt chuẩn ăn tươi do quá chua. Đề xuất chuyển thẳng sang các xưởng chế biến công nghiệp để ngâm đường, sấy khô hoặc làm mứt."
-        
+            if do_chin == "Chín": advice = "Dâu chín đỏ mọng toàn phần, hương thơm nồng nàn đặc trưng, rất dễ bị dập.<br><br><b>🛠️ Đề xuất xử lý:</b> Phải phân phối ngay trong ngày. Nếu lưu kho, bắt buộc bảo quản ngăn mát tủ lạnh và dùng trong tối đa 3 ngày. Tránh rửa nước khi chưa sử dụng."
+            elif do_chin == "Xanh": advice = "Phần lớn vỏ quả còn trắng hoặc xanh non. Dâu tây đặc biệt <b>KHÔNG</b> tự chín thêm sau khi đã bị hái khỏi cây.<br><br><b>🛠️ Đề xuất xử lý:</b> Không đạt chuẩn ăn tươi do quá chua. Đề xuất chuyển thẳng sang các xưởng chế biến công nghiệp để ngâm đường, sấy khô hoặc làm mứt."
         elif loai_qua == "Ổi":
-            if do_chin == "Chín": 
-                advice = "Ổi đã mềm, có hương thơm lan tỏa cực mạnh, thịt quả xốp và ngọt.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho nhu cầu ăn ổi mềm hoặc đưa vào dây chuyền ép nước trái cây đóng chai."
-            elif do_chin == "Xanh": 
-                advice = "Ổi cứng, vỏ xanh đậm, vị chát do lượng tanin còn rất cao.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho phân khúc khách hàng thích ăn ổi giòn. Nếu muốn ăn mềm, người dùng cần ủ thêm 2-4 ngày ở nhiệt độ phòng."
-        
+            if do_chin == "Chín": advice = "Ổi đã mềm, có hương thơm lan tỏa cực mạnh, thịt quả xốp và ngọt.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho nhu cầu ăn ổi mềm hoặc đưa vào dây chuyền ép nước trái cây đóng chai."
+            elif do_chin == "Xanh": advice = "Ổi cứng, vỏ xanh đậm, vị chát do lượng tanin còn rất cao.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cho phân khúc khách hàng thích ăn ổi giòn. Nếu muốn ăn mềm, người dùng cần ủ thêm 2-4 ngày ở nhiệt độ phòng."
         elif loai_qua == "Nho":
-            if do_chin == "Chín": 
-                advice = "Nho chín mọng, lớp vỏ căng bóng, độ đường phân bố đều toàn chùm.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cao cấp. Đóng gói vào hộp nhựa có lỗ thoáng khí và chuyển vào kho lạnh bảo quản ngay lập tức để tránh lên men."
-            elif do_chin == "Xanh": 
-                advice = "Nho chưa chín kỹ, vị chua gắt. Giống như Dâu Tây, Nho không có khả năng tự chín thêm sau khi hái.<br><br><b>🛠️ Đề xuất xử lý:</b> Đề xuất chuyển loại này sang các dây chuyền ép nước trái cây hỗn hợp chua ngọt hoặc ủ rượu vang non."
-        
+            if do_chin == "Chín": advice = "Nho chín mọng, lớp vỏ căng bóng, độ đường phân bố đều toàn chùm.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn cao cấp. Đóng gói vào hộp nhựa có lỗ thoáng khí và chuyển vào kho lạnh bảo quản ngay lập tức để tránh lên men."
+            elif do_chin == "Xanh": advice = "Nho chưa chín kỹ, vị chua gắt. Giống như Dâu Tây, Nho không có khả năng tự chín thêm sau khi hái.<br><br><b>🛠️ Đề xuất xử lý:</b> Đề xuất chuyển loại này sang các dây chuyền ép nước trái cây hỗn hợp chua ngọt hoặc ủ rượu vang non."
         elif loai_qua == "Lựu":
-            if do_chin == "Chín": 
-                advice = "Vỏ lựu căng, hạt bên trong đỏ thẫm và chứa lượng nước tối đa.<br><br><b>🛠️ Đề xuất xử lý:</b> Hoàn toàn đạt chuẩn thu hoạch. Tách hạt bán tươi hoặc chuyển qua khâu ép nước giải khát."
-            elif do_chin == "Xanh": 
-                advice = "Lựu chưa chín, vỏ còn rất cứng, hạt nhạt màu và chát.<br><br><b>🛠️ Đề xuất xử lý:</b> Lựu chín khá chậm. Cần để trong môi trường tối, thoáng mát ở nhiệt độ phòng vài ngày chờ chuyển hóa đường."
-        
+            if do_chin == "Chín": advice = "Vỏ lựu căng, hạt bên trong đỏ thẫm và chứa lượng nước tối đa.<br><br><b>🛠️ Đề xuất xử lý:</b> Hoàn toàn đạt chuẩn thu hoạch. Tách hạt bán tươi hoặc chuyển qua khâu ép nước giải khát."
+            elif do_chin == "Xanh": advice = "Lựu chưa chín, vỏ còn rất cứng, hạt nhạt màu và chát.<br><br><b>🛠️ Đề xuất xử lý:</b> Lựu chín khá chậm. Cần để trong môi trường tối, thoáng mát ở nhiệt độ phòng vài ngày chờ chuyển hóa đường."
         else:
-            if do_chin == "Chín": 
-                advice = "Trái cây đã đạt độ chín.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn tiêu dùng. Đưa ra thị trường hoặc bảo quản kho lạnh."
-            elif do_chin == "Xanh": 
-                advice = "Chưa đạt tiêu chuẩn độ chín tự nhiên.<br><br><b>🛠️ Đề xuất xử lý:</b> Đưa vào kho ủ thêm thời gian để đạt độ ngọt chuẩn."
+            if do_chin == "Chín": advice = "Trái cây đã đạt độ chín.<br><br><b>🛠️ Đề xuất xử lý:</b> Đạt chuẩn tiêu dùng. Đưa ra thị trường hoặc bảo quản kho lạnh."
+            elif do_chin == "Xanh": advice = "Chưa đạt tiêu chuẩn độ chín tự nhiên.<br><br><b>🛠️ Đề xuất xử lý:</b> Đưa vào kho ủ thêm thời gian để đạt độ ngọt chuẩn."
 
         color = "#34C759" if do_chin == "Chín" else "#FFCC00"
         status = "ĐẠT CHUẨN (APPROVED) ✅" if do_chin == "Chín" else "CẢNH BÁO (WARNING) ⚠️"
@@ -587,9 +593,11 @@ class FruitScannerApp(QMainWindow):
 
     def run_prediction(self, img_array, source, save_to_log=True):
         if not self.camera_active:
-            self.lbl_qa_val.setText("ĐANG PHÂN TÍCH MẠNG NEURAL...")
-            self.lbl_qa_val.setStyleSheet("color: #FF9800; font-size: 15px; font-weight: bold; background-color: #1A1A1A;")
-            QApplication.processEvents()
+            # Chỉ cập nhật trạng thái nếu không báo Xóa phông trước đó
+            if "ĐANG XÓA PHÔNG" not in self.lbl_qa_val.text():
+                self.lbl_qa_val.setText("ĐANG PHÂN TÍCH MẠNG NEURAL...")
+                self.lbl_qa_val.setStyleSheet("color: #FF9800; font-size: 15px; font-weight: bold; background-color: #1A1A1A;")
+                QApplication.processEvents()
         
         try:
             predictions = self.model.predict(img_array, verbose=0)
@@ -653,11 +661,11 @@ class FruitScannerApp(QMainWindow):
                 QProgressBar::chunk {{ background-color: {color}; border-radius: 4px; }}
             """)
             
-            # GỌI HỆ CHUYÊN GIA HTML MỚI
             ket_luan_html = self.get_advice_html(loai_qua, do_chin)
             
             self.lbl_qa_val.setText(ket_luan_html)
-            
+            self.lbl_qa_val.setStyleSheet("color: #AAAAAA; font-size: 14px; line-height: 1.6; padding: 10px; background-color: #1A1A1A; border-radius: 8px;")
+
             if save_to_log:
                 self.save_log(source, loai_qua, do_chin, f"{confidence:.1f}%")
             
