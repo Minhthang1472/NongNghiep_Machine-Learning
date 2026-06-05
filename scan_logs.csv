@@ -70,3 +70,34 @@ Timestamp,File Name,Fruit Type,Status,Confidence
 2026-06-04 14:07:52,RottenBanana (9).jpg,Chuối,Hư hỏng,99.9%
 2026-06-04 14:07:56,RottenBanana (45).jpg,Chuối,Hư hỏng,99.9%
 2026-06-04 14:08:00,RottenBanana (52).jpg,Chuối,Hư hỏng,99.9%
+2026-06-04 14:33:57,chuoi.jpg,Chuối,Chín,99.9%
+2026-06-04 14:34:17,Trái_táo.jpg,Táo,Chín,98.9%
+2026-06-04 14:34:26,nho_moc.jpg,Nho,Chín,99.3%
+2026-06-04 14:34:43,nho_moc.jpg,Nho,Chín,99.3%
+2026-06-04 14:35:51,UnripeGrape (73).jpg,Nho,Xanh,99.9%
+2026-06-04 14:36:02,RottenGrape (81).jpg,Nho,Hư hỏng,72.2%
+2026-06-05 08:10:37,UnripeGuava (6).jpg,Cam,Xanh,99.3%
+2026-06-05 08:11:53,UnripeOrange (66).jpg,Nho,Xanh,89.8%
+2026-06-05 08:22:03,Trái_táo.jpg,Táo,Chín,99.6%
+2026-06-05 08:22:08,nho_moc.jpg,Nho,Chín,99.9%
+2026-06-05 08:22:18,chuoi.jpg,Chuối,Chín,99.9%
+2026-06-05 08:22:35,UnripeOrange (8).jpg,Cam,Xanh,99.9%
+2026-06-05 08:22:39,UnripeOrange (80).jpg,Cam,Xanh,52.2%
+2026-06-05 08:22:43,UnripeOrange (64).jpg,Cam,Xanh,99.9%
+2026-06-05 08:22:46,UnripeOrange (63).jpg,Cam,Xanh,99.9%
+2026-06-05 08:22:49,UnripeOrange (67).jpg,Cam,Xanh,99.9%
+2026-06-05 08:22:52,UnripeOrange (82).jpg,Cam,Xanh,99.9%
+2026-06-05 08:23:00,UnripeGrape (9).jpg,Nho,Xanh,98.2%
+2026-06-05 08:23:04,UnripeGrape (68).jpg,Nho,Xanh,99.4%
+2026-06-05 08:23:44,UnripeGrape (77).jpg,Nho,Xanh,99.6%
+2026-06-05 08:27:44,RipeBanana (7).jpg,Chuối,Chín,99.9%
+2026-06-05 08:27:52,RipeStrawberry (73).jpg,Dâu Tây,Chín,99.7%
+2026-06-05 08:28:03,RottenApple (40).jpg,Cam,Chín,69.5%
+2026-06-05 08:28:10,RottenApple (52).jpg,Táo,Hư hỏng,88.0%
+2026-06-05 08:28:20,UnripeGrape (62).jpg,Nho,Xanh,99.9%
+2026-06-05 08:28:32,UnripeGuava (5).jpg,Cam,Xanh,99.2%
+2026-06-05 08:28:36,UnripeGuava (58).jpg,Ổi,Xanh,84.1%
+2026-06-05 08:28:39,UnripeGuava (51).jpg,Cam,Xanh,99.9%
+2026-06-05 08:28:42,UnripeGuava (49).jpg,Cam,Xanh,92.1%
+2026-06-05 08:28:46,UnripeGuava (52).jpg,Cam,Xanh,99.9%
+2026-06-05 08:28:51,UnripeGuava (61).jpg,Ổi,Xanh,70.0%

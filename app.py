@@ -470,7 +470,8 @@ class FruitScannerApp(QMainWindow):
                 self.frame_counter = 0
                 if target_crop.shape[0] > 0 and target_crop.shape[1] > 0:
                     img_resized = cv2.resize(target_crop, IMG_SIZE)
-                    img_array = np.expand_dims(img_resized, axis=0) / 255.0
+                    img_array = np.expand_dims(img_resized, axis=0)
+                    img_array = (img_array / 127.5) - 1.0
                     self.run_prediction(img_array, source="Live_Camera", save_to_log=False)
 
     def show_logs(self):
@@ -494,9 +495,9 @@ class FruitScannerApp(QMainWindow):
         # Dùng LANCZOS để ảnh mượt mà nhất
         resized_img = padded_img.resize(IMG_SIZE, Image.Resampling.LANCZOS)
         
-        # Chuyển sang dạng Array cho mô hình AI
         img_array = np.array(resized_img)
-        img_array = np.expand_dims(img_array, axis=0) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = (img_array / 127.5) - 1.0
         
         return img_array, padded_img
 

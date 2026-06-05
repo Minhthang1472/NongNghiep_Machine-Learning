@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
 from tensorflow.keras.applications import MobileNetV2 # type: ignore
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout # type: ignore
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input # type: ignore
 from tensorflow.keras.models import Model # type: ignore
 import matplotlib.pyplot as plt
 
@@ -40,7 +41,7 @@ def main():
     # 1. Đọc dữ liệu (có chức năng xoay, lật ảnh để tăng đa dạng)
     print("[INFO] Đang chuẩn bị dữ liệu hình ảnh...")
     datagen = ImageDataGenerator(
-        rescale=1./255, 
+        preprocessing_function=preprocess_input, 
         rotation_range=20,
         horizontal_flip=True,
         validation_split=0.2 # Dành 20% dữ liệu để tự kiểm tra
